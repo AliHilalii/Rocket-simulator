@@ -32,10 +32,9 @@ def air_density(altitude):
     return RHO0 * np.exp(-altitude / H)
 
 
-def drag_force(velocity, altitude):
+def drag_force(velocity, rho, Cd=CD, area=AREA):
     """Aerodynamic drag force, always opposing the current velocity."""
-    rho = air_density(altitude)
-    return -0.5 * rho * velocity * abs(velocity) * CD * AREA
+    return -0.5 * rho * velocity * abs(velocity) * Cd * area
 
 
 def thrust_force(fuel_remaining):
@@ -58,7 +57,8 @@ def simulate():
     while t < T_MAX:
         mass = DRY_MASS + fuel
         g = gravity(altitude)
-        F_drag = drag_force(velocity, altitude)
+        rho = air_density(altitude)
+        F_drag = drag_force(velocity, rho)
         F_thrust = thrust_force(fuel)
 
         if fuel > 0:
@@ -78,7 +78,7 @@ def simulate():
         history["velocity"].append(velocity)
         history["mass"].append(mass)
         history["drag"].append(F_drag)
-        history["density"].append(air_density(altitude))
+        history["density"].append(rho)
         history["gravity"].append(g)
 
         t += DT

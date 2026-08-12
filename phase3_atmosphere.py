@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
 
-from phase1_vertical_launch import gravity, air_density, drag_force
+from phase1_vertical_launch import gravity, drag_force
+from atmosphere import air_density
 from motor import load_motor, thrust_at
 
 # --- Airframe properties (everything on the rocket EXCEPT the motor) ---
-AIRFRAME_MASS = 1.2   # kg - body tube, fins, nose cone, recovery gear, payload
+AIRFRAME_MASS = 1.2   # kg
 CD     = 0.5
 RADIUS = 0.04         # m
 AREA   = 3.14159265 * RADIUS ** 2
@@ -16,7 +17,7 @@ T_MAX = 1000.0
 
 
 def simulate(motor):
-    """Run the 1D vertical flight simulation using a real motor thrust curve."""
+    """Same flight model as Phase 2, now using the layered Standard Atmosphere."""
     t = 0.0
     altitude = 0.0
     velocity = 0.0
@@ -24,7 +25,7 @@ def simulate(motor):
 
     history = {
         "time": [], "altitude": [], "velocity": [],
-        "mass": [], "thrust": [], "drag": [],
+        "mass": [], "thrust": [], "density": [],
     }
 
     while t < T_MAX:
@@ -53,7 +54,7 @@ def simulate(motor):
         history["velocity"].append(velocity)
         history["mass"].append(mass)
         history["thrust"].append(F_thrust)
-        history["drag"].append(F_drag)
+        history["density"].append(rho)
 
         t += DT
 
@@ -64,19 +65,16 @@ def print_summary(history, motor):
     altitudes = history["altitude"]
     velocities = history["velocity"]
     times = history["time"]
-
     apogee_idx = altitudes.index(max(altitudes))
 
     print(f"Motor:         {motor['name']} ({motor['manufacturer']})")
-    print(f"Total impulse: {motor['total_impulse']:.1f} N*s")
-    print(f"Burn time:     {motor['burn_time']:.2f} s")
     print(f"Max altitude:  {max(altitudes):.1f} m")
     print(f"Max velocity:  {max(velocities):.1f} m/s")
     print(f"Apogee at:     {times[apogee_idx]:.2f} s")
     print(f"Flight time:   {times[-1]:.2f} s")
 
 
-def plot_results(history, save_path="rocket_phase2_results.png"):
+def plot_results(history, save_path="rocket_phase3_results.png"):
     times = history["time"]
     fig, axes = plt.subplots(2, 2, figsize=(11, 8))
 
@@ -92,8 +90,8 @@ def plot_results(history, save_path="rocket_phase2_results.png"):
     axes[1, 0].set(xlabel="Time (s)", ylabel="Thrust (N)", title="Motor Thrust Curve")
     axes[1, 0].grid(True)
 
-    axes[1, 1].plot(times, history["mass"], color="green")
-    axes[1, 1].set(xlabel="Time (s)", ylabel="Mass (kg)", title="Vehicle Mass")
+    axes[1, 1].plot(times, history["density"], color="purple")
+    axes[1, 1].set(xlabel="Time (s)", ylabel="Density (kg/m^3)", title="Air Density (layered model)")
     axes[1, 1].grid(True)
 
     plt.tight_layout()
