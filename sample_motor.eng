@@ -1,0 +1,14 @@
+; SAMPLE / SYNTHETIC test motor file - this is NOT real certified data.
+; It exists only to test load_motor() while building the parser.
+; Replace this with a real RASP (.eng) file downloaded from
+; https://www.thrustcurve.org for your actual simulation.
+TestMotor 75 300 0 1.500 2.600 Sample
+0.0   0
+0.1   1400
+0.3   1600
+0.6   1500
+1.2   1350
+1.8   1200
+2.2   800
+2.4   300
+2.5   0
